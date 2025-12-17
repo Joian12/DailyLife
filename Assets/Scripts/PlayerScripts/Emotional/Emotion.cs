@@ -3,12 +3,22 @@ using UnityEngine;
 [System.Serializable]
 public class Emotion
 {
-    public string Name;
+    public EmotionType EmotionType;
     [Range(0f, 1f)] public float Intensity;
 
-    public Emotion(string name, float intensity = 0f)
+    public Emotion(EmotionType emotionType, float intensity = 0f)
     {
-        Name = name;
+        EmotionType = emotionType;
         Intensity = intensity;
     }
+}
+
+public enum EmotionType
+{
+    Default,
+    Anger,
+    Fear, 
+    Sadness,
+    Joy,
+    Disgust,
 }
