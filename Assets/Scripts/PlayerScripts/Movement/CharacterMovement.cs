@@ -1,56 +1,58 @@
-using System.Collections.Generic;
 using UnityEngine;
 
 public class CharacterMovement : MonoBehaviour
 {
     private ICharacterMovement _characterMovement;
     private ICharacterController _characterController;
-    
-    private CharacterControllerType _characterControllerType;
-    
+
+    [SerializeField] private CharacterControllerType _characterControllerType;
+
     [SerializeField] private TapCharacterController _tapCharacterController;
-    
+    [SerializeField] private KeyWASDCharacterController _wasdCharacterController;
+
+    [SerializeField] private float gridSize = 1f;
+
+    [SerializeField] private CharacterController _charController;
+
     private void Awake()
     {
         Setup();
     }
-    
+
     private void Setup()
     {
-        _characterMovement = new GridMovement(this.transform);
-        
         switch (_characterControllerType)
         {
             case CharacterControllerType.Tap:
                 _characterController = _tapCharacterController;
+                _characterMovement = new GridMovement(transform);
                 break;
-            case CharacterControllerType.JoyStick: //no joystick yet
-            case CharacterControllerType.Keyboard: //no keyboard yet
-            default:
+
+            case CharacterControllerType.Keyboard:
+                _characterController = _wasdCharacterController;
+                _characterMovement = new KeyWASDCharacterMovement(_charController, transform);
                 break;
         }
-    } 
+    }
 
     private void Update()
     {
         _characterMovement.Tick();
-        
-        if (_characterMovement.IsMoving())
+
+        _characterController.MoveInput();
+
+        Vector3 direction = _characterController.GetDirection();
+
+        if (direction == Vector3.zero)
         {
             return;
-        } 
-        
-        _characterController.MoveInput();
-        
-        Vector3 target = _characterController.GetDirection();
-        
+        }
+
+        Vector3 target = transform.position + new Vector3(
+                             Mathf.Round(direction.x),
+                             0f,
+                             Mathf.Round(direction.z)) * gridSize;
+
         _characterMovement.MoveToTarget(target);
     }
-}
-
-public enum CharacterControllerType
-{
-    Tap,
-    JoyStick,
-    Keyboard,
 }

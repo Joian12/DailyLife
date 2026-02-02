@@ -11,7 +11,6 @@ public class GridMovement : ICharacterMovement
     public GridMovement(Transform player)
     {
         _player = player;
-        _targetPosition = player.position;
     }
 
     public void MoveToTarget(Vector3 target)
@@ -19,13 +18,18 @@ public class GridMovement : ICharacterMovement
         _targetPosition = SnapToGrid(target);
     }
     
-    public bool IsMoving()
+    private bool IsMoving()
     {
         return Vector3.Distance(_player.position, _targetPosition) > 0.01f;
     }
     
     public void Tick()
     {
+        if (IsMoving())
+        {
+            return;
+        }
+        
         _player.position = Vector3.MoveTowards(
             _player.position,
             _targetPosition,
